@@ -1,13 +1,10 @@
-#!/usr/bin/env node
-
 const program = require("commander");
 const util = require("util");
 const exec = util.promisify(require("child_process").exec);
 const crypto = require("crypto");
 const readFile = util.promisify(require("fs").readFile);
 
-program.version("0.0.1");
-
+program.version("1.0.1-alpha.1");
 program.on("*", action => {
   console.log("Unknown command '" + action + "'");
   return program.help();
@@ -291,4 +288,10 @@ program
     if (options.contributors) await outputContributions(config);
   });
 
-program.parse(process.argv);
+function run(args) {
+  program.parse(args);
+}
+
+module.exports = {
+  run
+}
