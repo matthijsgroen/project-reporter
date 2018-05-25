@@ -4,7 +4,7 @@ const { outputChangelog } = require("./changelog");
 const { outputCodebaseChanges } = require("./technology");
 const { outputContributions } = require("./contributors");
 
-program.version("1.0.1-alpha.2");
+program.version("1.0.1");
 
 const parseTag = tag => tag;
 
