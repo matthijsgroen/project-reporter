@@ -4,7 +4,7 @@ const exec = util.promisify(require("child_process").exec);
 const crypto = require("crypto");
 const readFile = util.promisify(require("fs").readFile);
 
-program.version("1.0.1-alpha.1");
+program.version("1.0.1-alpha.2");
 program.on("*", action => {
   console.log("Unknown command '" + action + "'");
   return program.help();
