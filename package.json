@@ -1,0 +1,19 @@
+{
+  "name": "project-reporter",
+  "version": "1.0.0",
+  "description": "Generate release and codebase reports",
+  "main": "index.js",
+  "repository": "https://github.com/matthijsgroen/project-reporter.git",
+  "author": "Matthijs Groen <matthijs.groen@gmail.com>",
+  "license": "MIT",
+  "bin": {
+    "report": "./src/cli.js"
+  },
+  "private": false,
+  "dependencies": {
+    "cloc": "^2.3.3"
+  },
+  "devDependencies": {
+    "prettier": "^1.12.1"
+  }
+}
