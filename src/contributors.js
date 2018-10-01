@@ -21,9 +21,7 @@ const outputContributions = async config => {
     `git shortlog -s -n -e --no-merges ${diffTag}..${reportTag}`
   );
 
-  const displayName = reportTag === "HEAD"
-   ? "here"
-  : reportTag
+  const displayName = reportTag === "HEAD" ? "here" : reportTag;
   console.log(
     `## Contributors that brought us from ${diffTag} to ${displayName}\n`
   );
@@ -34,21 +32,38 @@ const outputContributions = async config => {
     { caption: "Commits", align: "right", field: "commits" }
   ];
 
-  const rows = data
-    .split("\n")
-    .map((line, index) => {
-      const rowData = line.match(/^\s*(\d+)\s+([^<]+)<([^>+]+)>\s*$/);
-      if (!rowData) return null;
-      const imageRefKey = `image-${index}`;
-      const name = rowData[2].trim();
-      return {
-        name,
-        commits: rowData[1],
-        pictureRef: imageRef(name, imageRefKey),
-        picture: emailToPicture(rowData[3], name, imageRefKey)
-      };
-    })
-    .filter(Boolean);
+  const people = {};
+  data.split("\n").map((line, index) => {
+    const rowData = line.match(/^\s*(\d+)\s+([^<]+)<([^>+]+)>\s*$/);
+    if (!rowData) return null;
+    const imageRefKey = `image-${index}`;
+    const name = rowData[2].trim();
+    const exist = people[name];
+    const newPerson = {
+      name,
+      commits: parseInt(rowData[1], 10),
+      pictureRef: imageRef(name, imageRefKey),
+      picture: emailToPicture(rowData[3], name, imageRefKey)
+    };
+
+    const merged =
+      exist && newPerson
+        ? exist.commits > newPerson.commits
+          ? { ...exist, commits: exist.commits + newPerson.commits }
+          : { ...newPerson, commits: exist.commits + newPerson.commits }
+        : newPerson;
+    people[name] = merged;
+  });
+
+  const rows = Object.values(people)
+    .filter(Boolean)
+    .sort(
+      (a, b) => (a.commits < b.commits ? 1 : a.commits > b.commits ? -1 : 0)
+    )
+    .map(person => ({
+      ...person,
+      commits: `${person.commits}`
+    }));
 
   outputTable(columns, rows);
   console.log("");

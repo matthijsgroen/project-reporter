@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Support for `--from` and `--till` options
 - Support for tag-names as `latest-of-major`, `latest-of-major-x` (where
   x is the delta minus)
+- Merge contributors with the same name, giving the one with the most
+  commits preference
 
 ## [1.0.1] - 2018-05-25
 ### Fixed
