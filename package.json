@@ -1,6 +1,6 @@
 {
   "name": "project-reporter",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "Generate release and codebase reports",
   "main": "index.js",
   "repository": "https://github.com/matthijsgroen/project-reporter.git",

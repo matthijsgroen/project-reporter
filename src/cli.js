@@ -12,17 +12,18 @@ const outputTitle = config => {
   console.log(
     "# %s for %s - %s\n",
     config.title,
-    config.reportTag === "HEAD"
-    ? "upcoming release"
-    : config.reportTag,
+    config.reportTag === "HEAD" ? "upcoming release" : config.reportTag,
     config.reportDate
   );
 };
 
 program
-  .command("stats [tag]")
-  .description("Create a codebase diff")
-  .option("-t --tag [tag]", "Git tag to diff to [latest]", parseTag, "latest")
+  .command("stats", { isDefault: true })
+  .description(
+    "Create a codebase diff. By default, it will show the upcoming changes since the last tag."
+  )
+  .option("--from [tag]", "Git tag to diff from [HEAD]", parseTag, "HEAD")
+  .option("--till [tag]", "Git tag to diff to [latest]", parseTag, "latest")
   .option(
     "--title [title]",
     "Title for the report [Report]",
@@ -38,13 +39,38 @@ program
     parseTag,
     false
   )
-  .action(async (tag = "HEAD", options) => {
-    const config = await buildConfig(tag, options);
+  .action(async options => {
+    const config = await buildConfig(options);
+
+    if (!config.commit || !config.diffCommit) {
+      console.error("Couldn't determine both git commits for report");
+      process.exit(1);
+    }
 
     outputTitle(config);
     if (options.changelog) await outputChangelog(config);
     if (options.codebase) await outputCodebaseChanges(config);
     if (options.contributors) await outputContributions(config);
+  })
+  .on("--help", () => {
+    console.log("");
+    console.log("Examples:");
+    console.log("");
+    console.log("  Display upcoming changes:");
+    console.log("  $ project-reporter stats");
+    console.log("");
+    console.log("  Current release till previous major:");
+    console.log(
+      "  $ project-reporter stats --from latest --till latest-of-major-1"
+    );
+    console.log("  All changes of current major:");
+    console.log(
+      "  $ project-reporter stats --from latest-of-major --till lastest-of-major-1"
+    );
+    console.log("  All changes of previous major:");
+    console.log(
+      "  $ project-reporter stats --from latest-of-major-1 --till latest-of-major-2"
+    );
   });
 
 function run(args) {

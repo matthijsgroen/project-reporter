@@ -8,11 +8,18 @@ const searchLatestTag = async () => {
   }
 };
 
-const getCommitFromTag = async tag => {
-  const searchTag = tag === "latest" ? await searchLatestTag() : tag;
-  if (!searchTag) return null;
+const gitTagList = async () => {
   try {
-    return await captureOutputFromCommand(`git rev-list -n 1 "${searchTag}"`);
+    return await captureOutputFromCommand("git tag");
+  } catch (e) {
+    return null;
+  }
+};
+
+const getCommitFromTag = async tag => {
+  if (!tag) return null;
+  try {
+    return await captureOutputFromCommand(`git rev-list -n 1 "${tag}"`);
   } catch (e) {
     console.error(e);
     return null;
@@ -21,5 +28,6 @@ const getCommitFromTag = async tag => {
 
 module.exports = {
   searchLatestTag,
-  getCommitFromTag
+  getCommitFromTag,
+  gitTagList
 };
