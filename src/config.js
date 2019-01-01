@@ -1,4 +1,9 @@
-const { searchLatestTag, getCommitFromTag, gitTagList } = require("./git");
+const {
+  searchLatestTag,
+  getCommitFromTag,
+  gitTagList,
+  getCommitFromDate
+} = require("./git");
 const { captureOutputFromCommand } = require("./command");
 
 const tagToSemanticVersion = tag => {
@@ -62,12 +67,17 @@ const processTag = async tag =>
       ? await searchOfMajor(tag)
       : tag;
 
-const buildConfig = async options => {
-  const reportTag = await processTag(options.from);
-  const diffTag = await processTag(options.till);
+const commitFromTagOrDate = tagOrDate =>
+  /\d{4}-\d{2}-\d{2}/.test(tagOrDate)
+    ? getCommitFromDate(tagOrDate)
+    : getCommitFromTag(tagOrDate);
 
-  const commit = await getCommitFromTag(reportTag);
-  const diffCommit = await getCommitFromTag(diffTag);
+const buildConfig = async options => {
+  const diffTag = await processTag(options.from);
+  const reportTag = await processTag(options.till);
+
+  const commit = await commitFromTagOrDate(reportTag);
+  const diffCommit = await commitFromTagOrDate(diffTag);
 
   const reportDate = await captureOutputFromCommand(
     `git log ${commit} -n 1 --format=%ad --date=short`

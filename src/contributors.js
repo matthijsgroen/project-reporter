@@ -14,11 +14,11 @@ const emailToPicture = (email, name, ref) =>
 const imageRef = (name, ref) => `![${name}][${ref}]`;
 
 const outputContributions = async config => {
-  const { diffTag, reportTag } = config;
-  if (!(diffTag && reportTag)) return;
+  const { commit, diffCommit, reportTag, diffTag } = config;
+  if (!(commit && diffCommit)) return;
 
   const data = await captureOutputFromCommand(
-    `git shortlog -s -n -e --no-merges ${diffTag}..${reportTag}`
+    `git shortlog -s -n -e --no-merges ${diffCommit}..${commit}`
   );
 
   const displayName = reportTag === "HEAD" ? "here" : reportTag;
