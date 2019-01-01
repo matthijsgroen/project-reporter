@@ -13,6 +13,31 @@ const emailToPicture = (email, name, ref) =>
 
 const imageRef = (name, ref) => `![${name}][${ref}]`;
 
+const formatNumber = number => number.toLocaleString("en-US");
+
+const getAuthorStats = async (name, diffCommit, commit) => {
+  const result = await captureOutputFromCommand(
+    `git log --shortstat --author "${name}" --since ${diffCommit} --until ${commit} | grep "files\\? changed"`
+  );
+  const report = { add: 0, del: 0 };
+  const stats = result.split("\n").forEach(line => {
+    line
+      .split(",")
+      .map(item => item.trim().split(" "))
+      .forEach(([nr, update]) => {
+        const insert = update.startsWith("ins");
+        const deletion = update.startsWith("del");
+        const amount = parseInt(nr, 10);
+        insert
+          ? (report.add += amount)
+          : deletion
+            ? (report.del += amount)
+            : null;
+      });
+  });
+  return report;
+};
+
 const outputContributions = async config => {
   const { commit, diffCommit, reportTag, diffTag } = config;
   if (!(commit && diffCommit)) return;
@@ -29,7 +54,9 @@ const outputContributions = async config => {
   const columns = [
     { caption: " ", align: "left", field: "pictureRef" },
     { caption: "Name", align: "left", field: "name" },
-    { caption: "Commits", align: "right", field: "commits" }
+    { caption: "Commits", align: "right", field: "commits" },
+    { caption: "Additions", align: "right", field: "additions" },
+    { caption: "Deletions", align: "right", field: "deletions" }
   ];
 
   const people = {};
@@ -38,6 +65,7 @@ const outputContributions = async config => {
     if (!rowData) return null;
     const imageRefKey = `image-${index}`;
     const name = rowData[2].trim();
+
     const exist = people[name];
     const newPerson = {
       name,
@@ -62,9 +90,14 @@ const outputContributions = async config => {
     )
     .map(person => ({
       ...person,
-      commits: `${person.commits}`
+      commits: formatNumber(person.commits)
     }));
 
+  for (const person of rows) {
+    const statData = await getAuthorStats(person.name, diffCommit, commit);
+    person.additions = formatNumber(statData.add);
+    person.deletions = formatNumber(statData.del);
+  }
   outputTable(columns, rows);
   console.log("");
 
