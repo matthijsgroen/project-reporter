@@ -16,25 +16,27 @@ const imageRef = (name, ref) => `![${name}][${ref}]`;
 const formatNumber = number => number.toLocaleString("en-US");
 
 const getAuthorStats = async (name, diffCommit, commit) => {
-  const result = await captureOutputFromCommand(
-    `git log --shortstat --author "${name}" --since ${diffCommit} --until ${commit} | grep "files\\? changed"`
-  );
   const report = { add: 0, del: 0 };
-  const stats = result.split("\n").forEach(line => {
-    line
-      .split(",")
-      .map(item => item.trim().split(" "))
-      .forEach(([nr, update]) => {
-        const insert = update.startsWith("ins");
-        const deletion = update.startsWith("del");
-        const amount = parseInt(nr, 10);
-        insert
-          ? (report.add += amount)
-          : deletion
-            ? (report.del += amount)
-            : null;
-      });
-  });
+  try {
+    const result = await captureOutputFromCommand(
+      `git log --shortstat --author "${name}" ${diffCommit}..${commit} | grep "files\\? changed"`
+    );
+    const stats = result.split("\n").forEach(line => {
+      line
+        .split(",")
+        .map(item => item.trim().split(" "))
+        .forEach(([nr, update]) => {
+          const insert = update.startsWith("ins");
+          const deletion = update.startsWith("del");
+          const amount = parseInt(nr, 10);
+          insert
+            ? (report.add += amount)
+            : deletion
+              ? (report.del += amount)
+              : null;
+        });
+    });
+  } catch (e) {}
   return report;
 };
 
