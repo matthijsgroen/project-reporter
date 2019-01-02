@@ -26,8 +26,36 @@ const getCommitFromTag = async tag => {
   }
 };
 
+const getCommitFromDate = async date => {
+  try {
+    const result = await captureOutputFromCommand(
+      `git log --oneline --until ${date} -n1`
+    );
+    const sha = result.split(" ")[0];
+    return sha;
+  } catch (e) {
+    console.error(e);
+    return null;
+  }
+};
+
+const getTagFromDate = async date => {
+  try {
+    const result = await captureOutputFromCommand(
+      `git log --until ${date} -n1 --no-walk --tags --pretty="%h %d %s" --decorate=full`
+    );
+    const match = result.match(/tag: refs\/tags\/([^,)]+)/);
+    return match[1];
+  } catch (e) {
+    console.error(e);
+    return null;
+  }
+};
+
 module.exports = {
-  searchLatestTag,
+  getCommitFromDate,
   getCommitFromTag,
-  gitTagList
+  getTagFromDate,
+  gitTagList,
+  searchLatestTag
 };

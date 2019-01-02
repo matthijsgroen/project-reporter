@@ -22,8 +22,18 @@ program
   .description(
     "Create a codebase diff. By default, it will show the upcoming changes since the last tag."
   )
-  .option("--from [tag]", "Git tag to diff from [HEAD]", parseTag, "HEAD")
-  .option("--till [tag]", "Git tag to diff to [latest]", parseTag, "latest")
+  .option(
+    "--from, --since [tag]",
+    "Git tag to diff from [latest]",
+    parseTag,
+    "latest"
+  )
+  .option(
+    "--till, --until [tag]",
+    "Git tag to diff to [HEAD]",
+    parseTag,
+    "HEAD"
+  )
   .option(
     "--title [title]",
     "Title for the report [Report]",
