@@ -81,6 +81,10 @@ program
     console.log(
       "  $ project-reporter stats --from latest-of-major-1 --till latest-of-major-2"
     );
+    console.log("  All changes of a time period:");
+    console.log(
+      "  $ project-reporter stats --from 2018-01-01 --till 2019-01-01"
+    );
   });
 
 function run(args) {
