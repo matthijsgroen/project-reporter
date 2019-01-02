@@ -77,8 +77,8 @@ const tagFromTagOrDate = tagOrDate =>
   /\d{4}-\d{2}-\d{2}/.test(tagOrDate) ? getTagFromDate(tagOrDate) : tagOrDate;
 
 const buildConfig = async options => {
-  const diffTag = await processTag(options.from);
-  const reportTag = await processTag(options.till);
+  const diffTag = await processTag(options.from || options.since);
+  const reportTag = await processTag(options.till || options.until);
 
   const commit = await commitFromTagOrDate(reportTag);
   const diffCommit = await commitFromTagOrDate(diffTag);
